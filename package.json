@@ -1,0 +1,15 @@
+{
+  "type": "module",
+  "name": "vkalbumdld",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "run": "tsc & node build/index.js"
+  },
+  "dependencies": {
+    "modify-exif": "^0.0.1",
+    "node-fetch": "^3.2.3",
+    "puppeteer": "^13.5.1",
+    "typescript": "^4.6.2"
+  }
+}
