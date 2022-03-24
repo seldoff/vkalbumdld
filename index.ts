@@ -4,7 +4,11 @@ import fetch from 'node-fetch';
 import modifyExif from 'modify-exif';
 
 (async () => {
-    const browser = await puppeteer.launch({headless: false, defaultViewport: {height: 768, width: 1024}});
+    const browser = await puppeteer.launch({
+        executablePath: getPuppeteerChromePath(),
+        headless: false,
+        defaultViewport: {width: 1024, height: 768}
+    });
     const page = await browser.newPage();
     try {
         page.waitForSelector('a.JoinForm__notNowLink', {timeout: 0}).then(e => e?.click());
@@ -21,6 +25,19 @@ import modifyExif from 'modify-exif';
         await browser.close();
     }
 })();
+
+function getPuppeteerChromePath(): string {
+    if ((process as any).pkg) {
+        // When running from the packaged binary, chromium is placed beneath the executable.
+        return './chromium/chrome.exe';
+    } else {
+        let executablePath = (puppeteer as any).executablePath();
+        const parts = executablePath.split('.local-chromium');
+        // Bundling with esbuild breaks path resolution inside puppeteer. Fixing it.
+        parts[0] = './node_modules/puppeteer/';
+        return `${parts[0]}/.local-chromium/${parts[1]}`;
+    }
+}
 
 async function downloadAlbum(page: puppeteer.Page, album: string) {
     console.log(`Downloading album ${album}`);
