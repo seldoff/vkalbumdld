@@ -11,7 +11,7 @@ import modifyExif from 'modify-exif';
     });
     const page = await browser.newPage();
     try {
-        page.waitForSelector('a.JoinForm__notNowLink', {timeout: 0}).then(e => e?.click());
+        page.waitForSelector('a.JoinForm__notNowLink', {timeout: 0}).then(e => e?.click()).catch(() => {});
 
         for (let i = 2; i < process.argv.length; i++) {
             try {
