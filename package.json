@@ -3,9 +3,8 @@
   "scripts": {
     "build": "esbuild ./index.ts --bundle --sourcemap --platform=node --outfile=build/index.js",
     "run": "npm run build & node build/index.js",
-    "release": "npm run build & npm run pkg & npm run copy-chrome",
-    "pkg": "pkg ./build/index.js -o ./build/vkalbumdld -t node16-win-x64 --public",
-    "copy-chrome": "shx mkdir ./build/chromium & shx cp -r ./node_modules/puppeteer/.local-chromium/**/chrome-win/* ./build/chromium"
+    "release": "npm run build & npm run pkg",
+    "pkg": "pkg ./build/index.js -o ./build/vkalbumdld -t node16-win-x64 --public --options \"no-deprecation\""
   },
   "dependencies": {
     "esbuild": "^0.14.27",
@@ -13,7 +12,6 @@
     "node-fetch": "^3.2.3",
     "pkg": "^5.5.2",
     "puppeteer": "^13.5.1",
-    "shx": "^0.3.4",
     "typescript": "^4.6.2"
   }
 }

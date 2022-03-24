@@ -2,10 +2,12 @@ import puppeteer from 'puppeteer';
 import fs from 'fs';
 import fetch from 'node-fetch';
 import modifyExif from 'modify-exif';
+import os from 'os';
+import path from 'path';
 
 (async () => {
     const browser = await puppeteer.launch({
-        executablePath: getPuppeteerChromePath(),
+        executablePath: await getPuppeteerChromePath(),
         headless: false,
         defaultViewport: {width: 1024, height: 768}
     });
@@ -26,10 +28,26 @@ import modifyExif from 'modify-exif';
     }
 })();
 
-function getPuppeteerChromePath(): string {
+async function getPuppeteerChromePath(): Promise<string> {
     if ((process as any).pkg) {
-        // When running from the packaged binary, chromium is placed beneath the executable.
-        return './chromium/chrome.exe';
+        // We're in bundle created by pkg. Need to download Chrome.
+
+        // Tied to the used version of puppeteer
+        const revision = '970485';
+        const tmpDir = path.join(os.tmpdir(), 'vkalbumdld', revision);
+        if (!fs.existsSync(tmpDir)) {
+            fs.mkdirSync(tmpDir, {recursive: true});
+        }
+
+        const puppeteerAny: any = puppeteer;
+        // For some reason it's missing when running in bundle created by pkg
+        puppeteerAny._projectRoot = './';
+        const browserFetcher: puppeteer.BrowserFetcher = puppeteerAny.createBrowserFetcher({path: tmpDir});
+
+        console.log('Downloading Chrome...');
+        const revisionInfo = await browserFetcher.download(revision);
+        console.log('Done');
+        return revisionInfo.executablePath;
     } else {
         let executablePath = (puppeteer as any).executablePath();
         const parts = executablePath.split('.local-chromium');
